@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>📦 Historial de Equipos Devueltos</h3>
+    <a href="/" class="btn btn-primary">← Volver al Panel</a>
+</div>
+
+{% if entregas %}
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Fecha Entrega</th>
+            <th>Fecha Devolución</th>
+            <th>Equipo</th>
+            <th>Tipo</th>
+            <th>IMEI</th>
+            <th>Entregado a</th>
+            <th>Observaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entrega in entregas %}
+        <tr>
+            <td>{{ entrega.fecha }}</td>
+            <td>{{ entrega.fecha_devolucion }}</td>
+            <td>{{ entrega.equipo }}</td>
+            <td>{{ entrega.tipo_equipo }}</td>
+            <td>{{ entrega.imei or '' }}</td>
+            <td>{{ entrega.persona }}</td>
+            <td>{{ entrega.observaciones }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info text-center">Aún no se ha devuelto ningún equipo.</div>
+{% endif %}
+
+{% endblock %}

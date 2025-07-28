@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Editar Entrega</h3>
+<form method="POST" action="/actualizar/{{ entrega.id }}" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Equipo:</label>
+        <input type="text" class="form-control" name="equipo" value="{{ entrega.equipo }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tipo de equipo:</label>
+        <select class="form-select" name="tipo_equipo" id="tipo_equipo" onchange="toggleIMEI()" required>
+            <option value="Laptop" {% if entrega.tipo_equipo == 'Laptop' %}selected{% endif %}>Laptop</option>
+            <option value="Desktop" {% if entrega.tipo_equipo == 'Desktop' %}selected{% endif %}>Desktop</option>
+            <option value="Flota" {% if entrega.tipo_equipo == 'Flota' %}selected{% endif %}>Flota</option>
+            <option value="Monitor" {% if entrega.tipo_equipo == 'Monitor' %}selected{% endif %}>Monitor</option>
+            <option value="Otro" {% if entrega.tipo_equipo == 'Otro' %}selected{% endif %}>Otro</option>
+        </select>
+    </div>
+
+    <div class="mb-3" id="imei_group" style="display: none;">
+        <label class="form-label">IMEI:</label>
+        <input type="text" class="form-control" name="imei" value="{{ entrega.imei or '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Entregado a:</label>
+        <input type="text" class="form-control" name="persona" value="{{ entrega.persona }}" required>
+    </div>
+
+
+    <div class="mb-3">
+        <label class="form-label">Archivo adjunto (si quieres reemplazarlo):</label>
+        <input type="file" class="form-control" name="archivo">
+        {% if entrega.archivo %}
+            <p class="mt-1">Actual: 
+                <a href="{{ url_for('static', filename='uploads/' ~ entrega.archivo) }}" target="_blank">{{ entrega.archivo }}</a>
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Observaciones:</label>
+        <input type="text" class="form-control" name="observaciones" value="{{ entrega.observaciones }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <a href="/" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<script>
+function toggleIMEI() {
+    const tipo = document.getElementById("tipo_equipo").value;
+    const imeiGroup = document.getElementById("imei_group");
+    imeiGroup.style.display = (tipo === "Flota") ? "block" : "none";
+}
+
+// Mostrar IMEI si es tipo Flota al cargar
+document.addEventListener('DOMContentLoaded', function () {
+    toggleIMEI();
+});
+</script>
+{% endblock %}

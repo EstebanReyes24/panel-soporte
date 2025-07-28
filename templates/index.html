@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="mt-2">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="/" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" class="form-control" name="busqueda" placeholder="Buscar por equipo, persona, tipo o IMEI...">
+    </div>
+    <div class="col-md-2">
+        <input type="date" class="form-control" name="fecha">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Buscar / Filtrar</button>
+    </div>
+    <div class="col-auto">
+        <a href="/exportar" class="btn btn-success">Exportar a Excel</a>
+    </div>
+    <div class="col-auto">
+        <a href="/devueltos" class="btn btn-outline-secondary">Ver Devoluciones</a>
+    </div>
+</form>
+
+<form method="POST" action="/guardar" class="mb-4" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Equipo (nombre o serie):</label>
+        <input type="text" class="form-control" name="equipo" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tipo de equipo:</label>
+        <select class="form-select" name="tipo_equipo" id="tipo_equipo" onchange="toggleIMEI()" required>
+            <option value="">Selecciona una opción</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Desktop">Desktop</option>
+            <option value="Flota">Flota</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Otro">Otro</option>
+        </select>
+    </div>
+
+    <div class="mb-3" id="imei_group" style="display:none;">
+        <label class="form-label">IMEI (solo flota):</label>
+        <input type="text" class="form-control" name="imei">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Entregado a:</label>
+        <input type="text" class="form-control" name="persona" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Archivo adjunto (PDF, imagen, etc.):</label>
+        <input type="file" class="form-control" name="archivo">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Observaciones:</label>
+        <input type="text" class="form-control" name="observaciones">
+    </div>
+
+    <button type="submit" class="btn btn-success">Registrar Entrega</button>
+</form>
+
+<h4>Entregas Pendientes de Devolución</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Equipo</th>
+            <th>Tipo</th>
+            <th>IMEI</th>
+            <th>Entregado a</th>
+            <th>Observaciones</th>
+            <th>Archivo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entrega in entregas %}
+        <tr {% if entrega.fecha_limite and entrega.fecha_limite < entrega.fecha[:10] %} class="table-danger" {% endif %}>
+            <td>{{ entrega.fecha }}</td>
+            <td>{{ entrega.equipo }}</td>
+            <td>{{ entrega.tipo_equipo }}</td>
+            <td>{{ entrega.imei or '' }}</td>
+            <td>{{ entrega.persona }}</td>
+            <td>{{ entrega.observaciones }}</td>
+            <td>
+                {% if entrega.archivo %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ entrega.archivo) }}" class="btn btn-sm btn-info" target="_blank">Ver</a>
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td>
+                {{ entrega.fecha_limite or '—' }}
+            </td>
+            <td>
+                <a href="/editar/{{ entrega.id }}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="/eliminar/{{ entrega.id }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas eliminar esta entrega?')">Eliminar</a>
+                <a href="/devolver/{{ entrega.id }}" class="btn btn-sm btn-secondary">Devolver</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function toggleIMEI() {
+    const tipo = document.getElementById("tipo_equipo").value;
+    const imeiGroup = document.getElementById("imei_group");
+    imeiGroup.style.display = (tipo === "Flota") ? "block" : "none";
+}
+</script>
+{% endblock %}
