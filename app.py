@@ -105,7 +105,6 @@ def logout():
     return redirect('/login')
 
 @app.route('/registrar', methods=['GET', 'POST'])
-@login_required
 def registrar():
     if request.method == 'POST':
         nombre = request.form['nombre']
