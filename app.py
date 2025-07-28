@@ -59,8 +59,6 @@ def login():
         usuario = request.form['usuario']
         contrasena = request.form['contrasena']
         user = Usuario.query.filter_by(usuario=usuario).first()
-        if request.args.get('registrado') == '1':
-        flash('Usuario registrado correctamente', 'success')
         
         if user and user.check_password(contrasena):
             login_user(user)
