@@ -59,6 +59,9 @@ def login():
         usuario = request.form['usuario']
         contrasena = request.form['contrasena']
         user = Usuario.query.filter_by(usuario=usuario).first()
+        if request.args.get('registrado') == '1':
+        flash('Usuario registrado correctamente', 'success')
+        
         if user and user.check_password(contrasena):
             login_user(user)
             flash('Sesión iniciada correctamente', 'success')
@@ -119,8 +122,7 @@ def registrar():
         nuevo_usuario.set_password(contrasena)
         db.session.add(nuevo_usuario)
         db.session.commit()
-        flash("Usuario registrado correctamente", "success")
-        return redirect('/')
+       return redirect('/login?registrado=1')
 
     return render_template('registrar.html')
 
