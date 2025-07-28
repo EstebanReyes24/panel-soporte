@@ -67,8 +67,9 @@ def login():
             flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
     
-@login_required
+
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
     fecha_filtro = request.form.get('fecha')
     busqueda = request.form.get('busqueda', '').lower()
@@ -124,8 +125,9 @@ def registrar():
 
     return render_template('registrar.html')
 
-@login_required
+
 @app.route('/guardar', methods=['POST'])
+@login_required
 def guardar_entrega():
     equipo = request.form['equipo']
     tipo_equipo = request.form['tipo_equipo']
@@ -154,14 +156,16 @@ def guardar_entrega():
     return redirect('/')
 
 # Editar entrega
-@login_required
+
 @app.route('/editar/<int:id>')
+@login_required
 def editar(id):
     entrega = Entrega.query.get_or_404(id)
     return render_template('editar.html', entrega=entrega)
 
-@login_required
+
 @app.route('/actualizar/<int:id>', methods=['POST'])
+@login_required
 def actualizar(id):
     entrega = Entrega.query.get_or_404(id)
     entrega.equipo = request.form['equipo']
@@ -175,8 +179,9 @@ def actualizar(id):
     return redirect('/')
 
 # Eliminar
-@login_required
+
 @app.route('/eliminar/<int:id>')
+@login_required
 def eliminar(id):
     entrega = Entrega.query.get_or_404(id)
     db.session.delete(entrega)
@@ -184,8 +189,9 @@ def eliminar(id):
     return redirect('/')
 
 # Exportar
-@login_required
+
 @app.route('/exportar')
+@login_required
 def exportar():
     entregas = Entrega.query.order_by(Entrega.id.desc()).all()
     data = [{
@@ -203,8 +209,9 @@ def exportar():
     output.seek(0)
     return send_file(output, download_name="entregas.xlsx", as_attachment=True)
 
-@login_required
+
 @app.route('/devolver/<int:id>')
+@login_required
 def devolver(id):
     entrega = Entrega.query.get_or_404(id)
     entrega.devuelto = True
@@ -212,8 +219,9 @@ def devolver(id):
     db.session.commit()
     return redirect('/')
 
-@login_required
+
 @app.route('/devueltos')
+@login_required
 def devueltos():
     entregas = Entrega.query.filter_by(devuelto=True).order_by(Entrega.id.desc()).all()
     return render_template('devueltos.html', entregas=entregas)
