@@ -120,7 +120,7 @@ def registrar():
         nuevo_usuario.set_password(contrasena)
         db.session.add(nuevo_usuario)
         db.session.commit()
-       return redirect('/login?registrado=1')
+       return redirect('/')
 
     return render_template('registrar.html')
 
