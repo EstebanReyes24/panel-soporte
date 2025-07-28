@@ -53,13 +53,15 @@ class Usuario(UserMixin, db.Model):
 
 # Ruta principal con filtro por fecha y búsqueda
 
-@app.route('/login', methods=['GET', 'POST'])  # ✅ SIN login_required AQUÍ
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.args.get('registrado') == '1':
+        flash('Usuario registrado correctamente', 'success')
+
     if request.method == 'POST':
         usuario = request.form['usuario']
         contrasena = request.form['contrasena']
         user = Usuario.query.filter_by(usuario=usuario).first()
-        
         if user and user.check_password(contrasena):
             login_user(user)
             flash('Sesión iniciada correctamente', 'success')
@@ -67,7 +69,7 @@ def login():
         else:
             flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
-    
+
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
@@ -120,7 +122,8 @@ def registrar():
         nuevo_usuario.set_password(contrasena)
         db.session.add(nuevo_usuario)
         db.session.commit()
-       return redirect('/')
+       return redirect('/login?registrado=1')
+
 
     return render_template('registrar.html')
 
